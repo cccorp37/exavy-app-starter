@@ -13,18 +13,12 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Function to record user session
-const recordUserSession = async (user: User) => {
+// Function to record user session via SECURITY DEFINER RPC
+const recordUserSession = async (_user: User) => {
   try {
-    await supabase
-      .from('user_sessions')
-      .insert({
-        user_id: user.id,
-        email: user.email,
-        user_agent: navigator.userAgent,
-        logged_in_at: new Date().toISOString(),
-        last_active_at: new Date().toISOString()
-      });
+    await supabase.rpc('record_user_session', {
+      p_user_agent: navigator.userAgent,
+    });
   } catch (error) {
     console.error('Error recording session:', error);
   }

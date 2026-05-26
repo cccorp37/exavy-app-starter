@@ -887,7 +887,7 @@ export type Database = {
           status: string
           subject: string
           updated_at: string
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           admin_response?: string | null
@@ -900,7 +900,7 @@ export type Database = {
           status?: string
           subject: string
           updated_at?: string
-          user_id?: string | null
+          user_id?: string
         }
         Update: {
           admin_response?: string | null
@@ -913,7 +913,7 @@ export type Database = {
           status?: string
           subject?: string
           updated_at?: string
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -1199,6 +1199,10 @@ export type Database = {
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_user_blocked: { Args: { _user_id: string }; Returns: boolean }
+      record_user_session: {
+        Args: { p_user_agent: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
