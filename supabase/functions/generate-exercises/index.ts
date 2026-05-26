@@ -110,11 +110,28 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
+    // Personalization based on user profile
+    const { data: userProfile } = await supabase
+      .from('profiles')
+      .select('first_name, profession, academic_level, professional_domain, goals')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    const personalization = userProfile ? `
+
+PROFIL DE L'UTILISATEUR (à utiliser pour adapter l'exercice) :
+- Type : ${userProfile.profession === 'academic' ? 'Étudiant/élève' : 'Professionnel'}
+${userProfile.academic_level ? `- Niveau scolaire : ${userProfile.academic_level}` : ''}
+${userProfile.professional_domain ? `- Domaine professionnel : ${userProfile.professional_domain}` : ''}
+${userProfile.goals?.length ? `- Objectifs : ${userProfile.goals.join(', ')}` : ''}
+Adapte le vocabulaire, la complexité et les exemples concrets à ce profil.` : '';
+
     const systemPrompt = `Tu es un professeur expert en création d'exercices pédagogiques.
 Tu crées des exercices pratiques basés sur le contenu du document fourni.
 
 ${difficultyPrompts[difficulty] || difficultyPrompts.medium}
 ${typePrompts[exerciseType] || typePrompts.practice}
+${personalization}
 
 ${generateVariant ? `Ceci est la variante ${variantNumber} pour le concept "${concept}". Crée un exercice similaire mais avec des valeurs/contextes différents.` : ''}
 
