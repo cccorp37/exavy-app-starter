@@ -127,6 +127,7 @@ Types de conseils possibles:
 4. "🎯 Point clé" - Une notion fondamentale
 
 IMPORTANT: Ne répète JAMAIS un conseil déjà donné. Voici les hashes des conseils précédents à éviter: ${shownHashes.slice(0, 10).join(', ')}
+${personalization}
 
 Réponds UNIQUEMENT en JSON:
 {
