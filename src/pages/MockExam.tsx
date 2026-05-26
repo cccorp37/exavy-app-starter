@@ -212,9 +212,28 @@ const MockExam = () => {
     return (
       <MainLayout>
         <div className="max-w-4xl mx-auto space-y-4 p-4 md:p-6">
-          <Button variant="ghost" size="sm" onClick={() => navigate('/documents')}>
-            <ArrowLeft className="h-4 w-4 mr-2" /> Retour
-          </Button>
+          <div className="flex items-center justify-between no-print">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/documents')}>
+              <ArrowLeft className="h-4 w-4 mr-2" /> Retour
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => window.print()}>
+              <Printer className="w-4 h-4 mr-2" /> Imprimer / PDF
+            </Button>
+          </div>
+
+          <PrintableExam
+            institutionLabel={`${examLabel} — Copie corrigée`}
+            title={exam.title}
+            subject={exam.subject}
+            durationMinutes={exam.duration_minutes}
+            totalPoints={exam.total_points}
+            questions={exam.questions as any}
+            solutions={exam.questions.map(q => ({
+              question_id: q.id,
+              answer: feedback.questionFeedback?.[q.id]?.correctAnswer || q.correctAnswer || '—',
+            }))}
+            includeSolutions
+          />
 
           <div className="bg-card border-2 border-foreground/20 rounded-sm shadow-lg overflow-hidden">
             {/* Results Header */}
