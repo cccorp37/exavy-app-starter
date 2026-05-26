@@ -88,10 +88,10 @@ Deno.serve(async (req) => {
 
     if (!paymentResponse.ok) {
       const errorText = await paymentResponse.text();
-      console.error('Payment initiation failed:', errorText);
+      console.error('Payment initiation failed:', paymentResponse.status, errorText);
       return new Response(
-        JSON.stringify({ error: 'Failed to initiate payment', details: errorText }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'Unable to initiate payment. Please try again.' }),
+        { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -200,16 +200,58 @@ async function checkPaymentStatus(reference: string) {
 async function handleWebhook(req: Request) {
   try {
     const webhookSecret = Deno.env.get('CAMPAY_WEBHOOK_SECRET');
-    const body = await req.json();
-    
-    console.log('Webhook received:', body);
+    const rawBody = await req.text();
+    const signature = req.headers.get('x-campay-signature') || req.headers.get('x-hub-signature-256');
 
-    // Verify webhook signature if provided
-    const signature = req.headers.get('x-campay-signature');
-    if (webhookSecret && signature) {
-      console.log('Webhook signature:', signature);
+    // Enforce HMAC signature verification when a secret is configured
+    if (!webhookSecret) {
+      console.error('CAMPAY_WEBHOOK_SECRET is not configured; refusing webhook');
+      return new Response(
+        JSON.stringify({ error: 'Webhook not configured' }),
+        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    if (!signature) {
+      return new Response(
+        JSON.stringify({ error: 'Missing signature' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
+    const enc = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      'raw',
+      enc.encode(webhookSecret),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign']
+    );
+    const sigBuf = await crypto.subtle.sign('HMAC', key, enc.encode(rawBody));
+    const expected = Array.from(new Uint8Array(sigBuf))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+    const provided = signature.replace(/^sha256=/, '').toLowerCase();
+
+    // Constant-time compare
+    if (expected.length !== provided.length) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid signature' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    let diff = 0;
+    for (let i = 0; i < expected.length; i++) {
+      diff |= expected.charCodeAt(i) ^ provided.charCodeAt(i);
+    }
+    if (diff !== 0) {
+      console.error('Invalid Campay webhook signature');
+      return new Response(
+        JSON.stringify({ error: 'Invalid signature' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const body = JSON.parse(rawBody);
     const { status, reference, external_reference, amount, operator } = body;
 
     if (status === 'SUCCESSFUL') {
