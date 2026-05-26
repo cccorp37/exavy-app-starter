@@ -343,9 +343,25 @@ const MockExam = () => {
           </AlertDialogContent>
         </AlertDialog>
 
-        <Button variant="ghost" size="sm" onClick={() => navigate('/documents')}>
-          <ArrowLeft className="h-4 w-4 mr-2" /> Retour
-        </Button>
+        <div className="flex items-center justify-between no-print">
+          <Button variant="ghost" size="sm" onClick={() => navigate('/documents')}>
+            <ArrowLeft className="h-4 w-4 mr-2" /> Retour
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => window.print()}>
+            <Printer className="w-4 h-4 mr-2" /> Imprimer / PDF
+          </Button>
+        </div>
+
+        {/* Hidden printable epreuve */}
+        <PrintableExam
+          institutionLabel={`${examLabel} — Examen blanc`}
+          title={exam.title}
+          subject={exam.subject}
+          durationMinutes={exam.duration_minutes}
+          totalPoints={exam.total_points}
+          instructions={exam.instructions}
+          questions={exam.questions as any}
+        />
 
         {/* ========== EXAM PAPER ========== */}
         <div className="bg-card border-2 border-foreground/20 rounded-sm shadow-lg overflow-hidden">
