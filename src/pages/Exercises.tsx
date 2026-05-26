@@ -292,11 +292,31 @@ export default function Exercises() {
   return (
     <MainLayout>
       <div className="max-w-4xl mx-auto space-y-4">
-        {/* Back button */}
-        <Button variant="ghost" size="sm" onClick={() => navigate('/exercises')} className="mb-2">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Retour aux exercices
-        </Button>
+        {/* Back button + Print */}
+        <div className="flex items-center justify-between mb-2 no-print">
+          <Button variant="ghost" size="sm" onClick={() => navigate('/exercises')}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Retour aux exercices
+          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => window.print()}>
+              <Printer className="h-4 w-4 mr-2" />
+              Imprimer / PDF
+            </Button>
+          </div>
+        </div>
+
+        {/* Hidden printable version — full epreuve */}
+        <PrintableExam
+          institutionLabel="Épreuve d'exercice"
+          title={currentExercise.title}
+          subject={currentExercise.subject}
+          durationMinutes={currentExercise.time_estimate_minutes}
+          totalPoints={totalPoints}
+          questions={currentExercise.questions}
+          solutions={currentExercise.solutions}
+          includeSolutions={showSolution || isCompleted}
+        />
 
         {/* ========== EXAM PAPER ========== */}
         <div className="bg-card border-2 border-foreground/20 rounded-sm shadow-lg overflow-hidden">
