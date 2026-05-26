@@ -113,6 +113,7 @@ Adapte le vocabulaire et les exemples à ce profil.` : '';
             role: 'system',
             content: `Tu es un expert en création de quiz éducatifs. Crée des QCM en français basés sur le contenu fourni.
 ${difficultyPrompt}${focusPrompt}
+${personalization}
 
 Format de réponse STRICTEMENT en JSON:
 {
