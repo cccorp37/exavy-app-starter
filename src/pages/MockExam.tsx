@@ -31,8 +31,10 @@ import {
   Trophy,
   Target,
   Pen,
-  ArrowLeft
+  ArrowLeft,
+  Printer
 } from 'lucide-react';
+import { PrintableExam } from '@/components/exam/PrintableExam';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
