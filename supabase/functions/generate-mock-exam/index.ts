@@ -148,10 +148,27 @@ serve(async (req) => {
     const format = examFormats[examType] || examFormats.custom;
     const numQuestions = questionCount || 10;
 
+    // Personalization based on user profile
+    const { data: userProfile } = await supabase
+      .from('profiles')
+      .select('first_name, profession, academic_level, professional_domain, goals')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    const personalization = userProfile ? `
+
+PROFIL DE L'UTILISATEUR :
+- Type : ${userProfile.profession === 'academic' ? 'Étudiant/élève' : 'Professionnel'}
+${userProfile.academic_level ? `- Niveau scolaire : ${userProfile.academic_level}` : ''}
+${userProfile.professional_domain ? `- Domaine professionnel : ${userProfile.professional_domain}` : ''}
+${userProfile.goals?.length ? `- Objectifs : ${userProfile.goals.join(', ')}` : ''}
+Adapte la formulation, la complexité et les contextes à ce profil.` : '';
+
     const systemPrompt = `Tu es un générateur d'examens professionnel pour les étudiants africains francophones.
 Tu crées des sujets d'examen réalistes basés sur le contenu fourni.
 
 ${format}
+${personalization}
 
 RÈGLES STRICTES:
 1. Génère exactement ${numQuestions} questions
