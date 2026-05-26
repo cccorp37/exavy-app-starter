@@ -146,6 +146,22 @@ serve(async (req) => {
       ? `\n\n⚠️ IMPORTANT: L'utilisateur montre des signes de fatigue (score: ${profile?.burnout_score}/100). Suggère-lui une pause de manière naturelle dans ta réponse.`
       : '';
 
+    // Fetch onboarding profile for personalization
+    const { data: userProfile } = await supabase
+      .from('profiles')
+      .select('first_name, profession, academic_level, professional_domain, goals')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    const profileContext = userProfile ? `
+
+PROFIL DE L'UTILISATEUR (personnalise tes réponses, recommandations et exemples) :
+- Prénom : ${userProfile.first_name || 'N/A'}
+- Type : ${userProfile.profession === 'academic' ? 'Étudiant/élève' : 'Professionnel'}
+${userProfile.academic_level ? `- Niveau scolaire : ${userProfile.academic_level}` : ''}
+${userProfile.professional_domain ? `- Domaine professionnel : ${userProfile.professional_domain}` : ''}
+${userProfile.goals?.length ? `- Objectifs : ${userProfile.goals.join(', ')}` : ''}` : '';
+
     const systemPrompt = `${basePersonality}
 
 Tu aides les étudiants africains à réviser pour leurs examens (Bac, Brevet, concours, etc.).
@@ -153,7 +169,7 @@ Tu parles en français et tu t'adaptes au niveau de l'utilisateur.
 Tu donnes des conseils personnalisés basés sur l'historique d'étude.
 Tu détectes quand l'utilisateur est fatigué et suggères des pauses.
 
-Style d'apprentissage de l'utilisateur: ${profile?.learning_style || 'visual'}${documentsContext}${statsContext}${breakContext}
+Style d'apprentissage de l'utilisateur: ${profile?.learning_style || 'visual'}${profileContext}${documentsContext}${statsContext}${breakContext}
 
 Règles:
 1. Sois concis mais utile

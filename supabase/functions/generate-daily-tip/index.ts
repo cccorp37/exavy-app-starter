@@ -75,6 +75,23 @@ serve(async (req) => {
 
     const shownHashes = shownTips?.map(t => t.tip_hash) || [];
 
+    // Fetch profile for personalization
+    const { data: userProfile } = await supabase
+      .from('profiles')
+      .select('first_name, profession, academic_level, professional_domain, goals')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    const personalization = userProfile ? `
+PROFIL DE L'UTILISATEUR (personnalise le conseil en fonction de ce profil) :
+- Prénom : ${userProfile.first_name || 'N/A'}
+- Type : ${userProfile.profession === 'academic' ? 'Étudiant/élève' : 'Professionnel'}
+${userProfile.academic_level ? `- Niveau scolaire : ${userProfile.academic_level}` : ''}
+${userProfile.professional_domain ? `- Domaine professionnel : ${userProfile.professional_domain}` : ''}
+${userProfile.goals?.length ? `- Objectifs : ${userProfile.goals.join(', ')}` : ''}
+Adapte le vocabulaire, les exemples et le ton à ce profil. Si possible, mentionne le prénom.
+` : '';
+
     // Prepare document excerpts for AI
     const documentExcerpts = documents.map(doc => ({
       title: doc.title,
@@ -110,6 +127,7 @@ Types de conseils possibles:
 4. "🎯 Point clé" - Une notion fondamentale
 
 IMPORTANT: Ne répète JAMAIS un conseil déjà donné. Voici les hashes des conseils précédents à éviter: ${shownHashes.slice(0, 10).join(', ')}
+${personalization}
 
 Réponds UNIQUEMENT en JSON:
 {

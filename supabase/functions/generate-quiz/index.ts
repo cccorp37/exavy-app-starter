@@ -80,6 +80,17 @@ serve(async (req) => {
     };
     const difficultyPrompt = difficultyMap[difficulty] || difficultyMap.medium;
 
+    // Personalization based on user profile
+    const { data: userProfile } = await supabase
+      .from('profiles')
+      .select('profession, academic_level, professional_domain, goals')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    const personalization = userProfile ? `
+PROFIL UTILISATEUR : ${userProfile.profession === 'academic' ? 'Étudiant' : 'Professionnel'}${userProfile.academic_level ? ` (${userProfile.academic_level})` : ''}${userProfile.professional_domain ? ` — ${userProfile.professional_domain}` : ''}.
+Adapte le vocabulaire et les exemples à ce profil.` : '';
+
     // Build focus prompt if user specified a focus area or specific part
     let focusPrompt = '';
     if (focusArea) {
@@ -102,6 +113,7 @@ serve(async (req) => {
             role: 'system',
             content: `Tu es un expert en création de quiz éducatifs. Crée des QCM en français basés sur le contenu fourni.
 ${difficultyPrompt}${focusPrompt}
+${personalization}
 
 Format de réponse STRICTEMENT en JSON:
 {
