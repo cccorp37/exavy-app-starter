@@ -56,8 +56,8 @@ serve(async (req: Request): Promise<Response> => {
       );
     }
 
-    // Create 3-day trial subscription
-    const expiresAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000); // 3 days
+    // Create 5-day trial subscription
+    const expiresAt = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000); // 5 days
 
     const { error: insertError } = await supabase.from("subscriptions").insert({
       user_id: userId,
