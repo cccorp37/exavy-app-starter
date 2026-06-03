@@ -90,6 +90,8 @@ export const GenerateOptionsDialog = ({
       );
       onOpenChange(false);
       onGenerated?.();
+      // Auto-open the generated content
+      navigate(type === 'quiz' ? `/quiz/${documentId}` : `/flashcards/${documentId}`);
     } catch (error) {
       console.error('Generation error:', error);
       toast.error(error instanceof Error ? error.message : 'Erreur lors de la génération');
