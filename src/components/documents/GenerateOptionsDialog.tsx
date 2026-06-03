@@ -42,6 +42,7 @@ export const GenerateOptionsDialog = ({
   userId,
   onGenerated,
 }: GenerateOptionsDialogProps) => {
+  const navigate = useNavigate();
   const [isGenerating, setIsGenerating] = useState(false);
   const [count, setCount] = useState(type === 'quiz' ? 10 : 15);
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
