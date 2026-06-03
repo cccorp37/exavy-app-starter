@@ -78,7 +78,7 @@ serve(async (req: Request): Promise<Response> => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: "Essai premium de 3 jours activé !",
+        message: "Essai premium de 5 jours activé !",
         expires_at: expiresAt.toISOString()
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
