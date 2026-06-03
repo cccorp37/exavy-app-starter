@@ -306,32 +306,32 @@ const ChatAI = () => {
 
   return (
     <MainLayout>
-      <div className="h-[calc(100vh-2rem)] p-6 flex flex-col">
+      <div className="h-[100dvh] md:h-[calc(100vh-2rem)] p-3 sm:p-4 md:p-6 flex flex-col min-w-0 overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5">
-              <Brain className="w-6 h-6 text-primary" />
+        <div className="flex items-center justify-between gap-2 mb-3 md:mb-6 min-w-0">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 flex-shrink-0">
+              <Brain className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
             </div>
-            <div>
-              <h1 className="text-xl font-bold flex items-center gap-2">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-base sm:text-xl font-bold flex items-center gap-2 truncate">
                 EXABOT
-                <Badge variant="secondary" className="text-xs">Coach IA</Badge>
+                <Badge variant="secondary" className="text-[10px] sm:text-xs hidden sm:inline-flex">Coach IA</Badge>
               </h1>
-              <p className="text-sm text-muted-foreground">Ton coach d'apprentissage personnel</p>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">Ton coach d'apprentissage personnel</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
             {profile && burnoutStatus && (
-              <Badge variant={burnoutStatus.color as any} className="gap-1">
+              <Badge variant={burnoutStatus.color as any} className="gap-1 hidden md:inline-flex">
                 <burnoutStatus.icon className="w-3 h-3" />
                 {burnoutStatus.label}
               </Badge>
             )}
             
             {profile?.streak_days ? (
-              <Badge variant="outline" className="gap-1">
+              <Badge variant="outline" className="gap-1 text-xs">
                 <Flame className="w-3 h-3 text-orange-500" />
                 {profile.streak_days}j
               </Badge>
@@ -339,7 +339,7 @@ const ChatAI = () => {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon">
+                <Button variant="outline" size="icon" className="h-9 w-9">
                   <Settings className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -375,14 +375,14 @@ const ChatAI = () => {
         </div>
 
         {/* Chat Area */}
-        <Card className="flex-1 flex flex-col overflow-hidden">
-          <CardHeader className="py-3 border-b">
+        <Card className="flex-1 flex flex-col overflow-hidden min-w-0 min-h-0">
+          <CardHeader className="py-2 sm:py-3 border-b">
             <CardTitle className="text-sm flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-primary" />
               {profile?.personality_type === 'friendly' ? '💬 Discussion avec EXABOT' : 'Assistant EXABOT'}
             </CardTitle>
           </CardHeader>
-          <CardContent className="flex-1 p-0 flex flex-col">
+          <CardContent className="flex-1 p-0 flex flex-col min-h-0 min-w-0">
             <ScrollArea className="flex-1 p-4" ref={scrollRef}>
               <div className="space-y-4">
                 {messages.map((message) => (
