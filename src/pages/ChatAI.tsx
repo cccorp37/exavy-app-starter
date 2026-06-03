@@ -383,28 +383,28 @@ const ChatAI = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="flex-1 p-0 flex flex-col min-h-0 min-w-0">
-            <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-              <div className="space-y-4">
+            <ScrollArea className="flex-1 p-3 sm:p-4 min-w-0" ref={scrollRef}>
+              <div className="space-y-4 min-w-0">
                 {messages.map((message) => (
                   <div
                     key={message.id}
-                    className={`flex gap-3 ${
+                    className={`flex gap-2 sm:gap-3 min-w-0 ${
                       message.role === 'user' ? 'justify-end' : 'justify-start'
                     }`}
                   >
                     {message.role === 'assistant' && (
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center flex-shrink-0">
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center flex-shrink-0">
                         <Bot className="w-4 h-4 text-primary-foreground" />
                       </div>
                     )}
                     <div
-                      className={`max-w-[80%] rounded-lg p-3 ${
+                      className={`max-w-[85%] sm:max-w-[80%] min-w-0 rounded-lg p-3 ${
                         message.role === 'user'
                           ? 'bg-primary text-primary-foreground'
                           : 'bg-muted'
                       }`}
                     >
-                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      <p className="text-sm whitespace-pre-wrap break-words overflow-wrap-anywhere">{message.content}</p>
                       <div className="flex items-center justify-between mt-1">
                         <p className="text-xs opacity-70">
                           {message.timestamp.toLocaleTimeString('fr-FR', {
