@@ -67,7 +67,7 @@ const Auth = () => {
           <div className="space-y-4">
             <div className="rounded-lg bg-primary/5 border border-primary/20 p-3">
               <p className="text-xs text-center text-muted-foreground">
-                🎉 <span className="font-medium text-primary">3 jours d'essai Premium gratuit</span> à la création du compte !
+                🎉 <span className="font-medium text-primary">5 jours d'essai Premium gratuit</span> à la création du compte !
               </p>
             </div>
 

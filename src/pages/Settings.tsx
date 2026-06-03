@@ -55,10 +55,10 @@ const Settings = () => {
     const diff = expires.getTime() - now.getTime();
     if (diff <= 0) return null;
     const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-    // Only show for short subscriptions (trial = 3 days)
+    // Only show for short subscriptions (trial = 5 days)
     const started = new Date(subscription.started_at);
     const subDuration = expires.getTime() - started.getTime();
-    if (subDuration <= 4 * 24 * 60 * 60 * 1000) return days; // trial if ≤ 4 days
+    if (subDuration <= 6 * 24 * 60 * 60 * 1000) return days; // trial if ≤ 6 days
     return null;
   };
 

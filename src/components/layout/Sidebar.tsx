@@ -37,28 +37,29 @@ import {
 } from 'lucide-react';
 
 const menuItems = [
-  { icon: LayoutDashboard, label: 'Tableau de bord', path: '/dashboard' },
-  { icon: FileText, label: 'Documents', path: '/documents' },
-  { icon: Brain, label: 'Quiz', path: '/quiz' },
-  { icon: BookOpen, label: 'Flashcards', path: '/flashcards' },
-  { icon: Sparkles, label: 'Résumés', path: '/summaries' },
-  { icon: Map, label: 'Mind Maps', path: '/mindmap' },
-  { icon: MessageSquare, label: 'EXABOT', path: '/chat' },
-  { icon: FolderKanban, label: 'Projets', path: '/projects' },
-  { icon: Calendar, label: 'Planning', path: '/planning' },
-  { icon: Target, label: 'Compétences', path: '/skills' },
-  { icon: Languages, label: 'Reformuler', path: '/rephrase' },
-  { icon: ClipboardList, label: 'Exercices', path: '/exercises' },
-  { icon: GraduationCap, label: 'Examens blancs', path: '/mock-exam' },
-  { icon: Presentation, label: 'Présentations', path: '/presentations' },
+  { icon: LayoutDashboard, label: 'Tableau de bord', path: '/dashboard', color: 'text-primary' },
+  { icon: FileText, label: 'Documents', path: '/documents', color: 'text-blue-500' },
+  { icon: FolderKanban, label: 'Projets', path: '/projects', color: 'text-indigo-500' },
+  { icon: Brain, label: 'Quiz', path: '/quiz', color: 'text-violet-500' },
+  { icon: BookOpen, label: 'Flashcards', path: '/flashcards', color: 'text-pink-500' },
+  { icon: Sparkles, label: 'Résumés', path: '/summaries', color: 'text-amber-500' },
+  { icon: Map, label: 'Mind Maps', path: '/mindmap', color: 'text-emerald-500' },
+  { icon: MessageSquare, label: 'EXABOT', path: '/chat', color: 'text-fuchsia-500' },
+  { icon: Calendar, label: 'Planning', path: '/planning', color: 'text-cyan-500' },
+  { icon: Target, label: 'Compétences', path: '/skills', color: 'text-orange-500' },
+  { icon: Languages, label: 'Reformuler', path: '/rephrase', color: 'text-teal-500' },
+  { icon: ClipboardList, label: 'Exercices', path: '/exercises', color: 'text-rose-500' },
+  { icon: GraduationCap, label: 'Examens blancs', path: '/mock-exam', color: 'text-red-500' },
+  { icon: Presentation, label: 'Présentations', path: '/presentations', color: 'text-sky-500' },
 ];
 
 const bottomMenuItems = [
-  { icon: User, label: 'Profil', path: '/profile' },
-  { icon: CreditCard, label: 'Abonnement', path: '/subscription' },
-  { icon: HelpCircle, label: 'Aide', path: '/help' },
-  { icon: Phone, label: 'Contact', path: '/contact' },
-  { icon: Settings, label: 'Paramètres', path: '/settings' },
+  { icon: User, label: 'Profil', path: '/profile', color: 'text-primary' },
+  { icon: CreditCard, label: 'Abonnement', path: '/subscription', color: 'text-amber-500' },
+  { icon: Bell, label: 'Notifications', path: '/notifications', color: 'text-orange-500' },
+  { icon: HelpCircle, label: 'Aide', path: '/help', color: 'text-cyan-500' },
+  { icon: Phone, label: 'Contact', path: '/contact', color: 'text-emerald-500' },
+  { icon: Settings, label: 'Paramètres', path: '/settings', color: 'text-muted-foreground' },
 ];
 
 export const Sidebar = () => {
@@ -74,9 +75,9 @@ export const Sidebar = () => {
     navigate('/');
   };
 
-  const NavItem = ({ icon: Icon, label, path }: { icon: any; label: string; path: string }) => {
+  const NavItem = ({ icon: Icon, label, path, color }: { icon: any; label: string; path: string; color?: string }) => {
     const isActive = location.pathname === path;
-    
+
     return (
       <button
         onClick={() => {
@@ -89,14 +90,16 @@ export const Sidebar = () => {
         )}
       >
         <div className={cn(
-          "w-8 h-8 flex items-center justify-center transition-all duration-200",
-          isActive ? "bg-accent text-accent-foreground" : "bg-transparent"
+          "w-9 h-9 flex items-center justify-center rounded-md transition-all duration-200 flex-shrink-0",
+          isActive
+            ? "bg-accent text-accent-foreground shadow-sm"
+            : cn("bg-muted/40 group-hover:bg-muted/70", color)
         )}>
           <Icon className="w-4 h-4" />
         </div>
-        <span className="text-sm font-medium">{label}</span>
+        <span className="text-sm font-medium truncate">{label}</span>
         {isActive && (
-          <div className="absolute right-4 w-2 h-2 bg-accent" />
+          <div className="absolute right-4 w-2 h-2 bg-accent rounded-full" />
         )}
       </button>
     );

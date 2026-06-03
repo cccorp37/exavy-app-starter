@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
@@ -41,6 +42,7 @@ export const GenerateOptionsDialog = ({
   userId,
   onGenerated,
 }: GenerateOptionsDialogProps) => {
+  const navigate = useNavigate();
   const [isGenerating, setIsGenerating] = useState(false);
   const [count, setCount] = useState(type === 'quiz' ? 10 : 15);
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
@@ -88,6 +90,8 @@ export const GenerateOptionsDialog = ({
       );
       onOpenChange(false);
       onGenerated?.();
+      // Auto-open the generated content
+      navigate(type === 'quiz' ? `/quiz/${documentId}` : `/flashcards/${documentId}`);
     } catch (error) {
       console.error('Generation error:', error);
       toast.error(error instanceof Error ? error.message : 'Erreur lors de la génération');
