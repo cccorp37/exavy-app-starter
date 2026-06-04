@@ -80,7 +80,7 @@ export const Sidebar = () => {
     navigate('/');
   };
 
-  const NavItem = ({ icon: Icon, label, path, color }: { icon: any; label: string; path: string; color?: string }) => {
+  const NavItem = ({ icon: Icon, label, path, gradient }: { icon: any; label: string; path: string; gradient?: string }) => {
     const isActive = location.pathname === path;
 
     return (
@@ -95,12 +95,12 @@ export const Sidebar = () => {
         )}
       >
         <div className={cn(
-          "w-9 h-9 flex items-center justify-center rounded-md transition-all duration-200 flex-shrink-0",
-          isActive
-            ? "bg-accent text-accent-foreground shadow-sm"
-            : cn("bg-muted/40 group-hover:bg-muted/70", color)
+          "relative w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-200 flex-shrink-0 ring-1 ring-white/10 shadow-sm",
+          "bg-gradient-to-br",
+          gradient || "from-primary to-secondary",
+          isActive && "scale-105 shadow-md"
         )}>
-          <Icon className="w-4 h-4" />
+          <Icon className="w-4 h-4 text-white drop-shadow-sm" strokeWidth={2.25} />
         </div>
         <span className="text-sm font-medium truncate">{label}</span>
         {isActive && (
@@ -109,6 +109,7 @@ export const Sidebar = () => {
       </button>
     );
   };
+
 
   return (
     <>
