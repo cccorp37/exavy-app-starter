@@ -47,7 +47,7 @@ export const AdminMarketplaceManager = () => {
 
   const load = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from("marketplace_items")
       .select("*")
       .order("created_at", { ascending: false });
