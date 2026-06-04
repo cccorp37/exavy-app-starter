@@ -176,7 +176,7 @@ export const Sidebar = () => {
                   Admin
                 </span>
               </div>
-              <NavItem icon={Shield} label="Administration" path="/admin" />
+              <NavItem icon={Shield} label="Administration" path="/admin" gradient="from-red-600 to-rose-700" />
             </>
           )}
         </nav>
