@@ -65,31 +65,7 @@ const bottomMenuItems = [
 ];
 
 
-const menuItems = [
-  { icon: LayoutDashboard, label: 'Tableau de bord', path: '/dashboard', color: 'text-primary' },
-  { icon: FileText, label: 'Documents', path: '/documents', color: 'text-blue-500' },
-  { icon: FolderKanban, label: 'Projets', path: '/projects', color: 'text-indigo-500' },
-  { icon: Brain, label: 'Quiz', path: '/quiz', color: 'text-violet-500' },
-  { icon: BookOpen, label: 'Flashcards', path: '/flashcards', color: 'text-pink-500' },
-  { icon: Sparkles, label: 'Résumés', path: '/summaries', color: 'text-amber-500' },
-  { icon: Map, label: 'Mind Maps', path: '/mindmap', color: 'text-emerald-500' },
-  { icon: MessageSquare, label: 'EXABOT', path: '/chat', color: 'text-fuchsia-500' },
-  { icon: Calendar, label: 'Planning', path: '/planning', color: 'text-cyan-500' },
-  { icon: Target, label: 'Compétences', path: '/skills', color: 'text-orange-500' },
-  { icon: Languages, label: 'Reformuler', path: '/rephrase', color: 'text-teal-500' },
-  { icon: ClipboardList, label: 'Exercices', path: '/exercises', color: 'text-rose-500' },
-  { icon: GraduationCap, label: 'Examens blancs', path: '/mock-exam', color: 'text-red-500' },
-  { icon: Presentation, label: 'Présentations', path: '/presentations', color: 'text-sky-500' },
-];
 
-const bottomMenuItems = [
-  { icon: User, label: 'Profil', path: '/profile', color: 'text-primary' },
-  { icon: CreditCard, label: 'Abonnement', path: '/subscription', color: 'text-amber-500' },
-  { icon: Bell, label: 'Notifications', path: '/notifications', color: 'text-orange-500' },
-  { icon: HelpCircle, label: 'Aide', path: '/help', color: 'text-cyan-500' },
-  { icon: Phone, label: 'Contact', path: '/contact', color: 'text-emerald-500' },
-  { icon: Settings, label: 'Paramètres', path: '/settings', color: 'text-muted-foreground' },
-];
 
 export const Sidebar = () => {
   const navigate = useNavigate();
