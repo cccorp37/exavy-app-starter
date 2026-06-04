@@ -1,12 +1,12 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, FileText, MessageSquare, FolderKanban, User } from "lucide-react";
+import { LayoutDashboard, FileText, MessageSquare, ShoppingBag, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 
 const ITEMS = [
   { icon: LayoutDashboard, label: "Accueil", path: "/dashboard" },
   { icon: FileText, label: "Docs", path: "/documents" },
-  { icon: FolderKanban, label: "Projets", path: "/projects" },
+  { icon: ShoppingBag, label: "Shop", path: "/marketplace" },
   { icon: MessageSquare, label: "EXABOT", path: "/chat" },
   { icon: User, label: "Profil", path: "/profile" },
 ];
