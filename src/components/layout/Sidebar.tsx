@@ -33,34 +33,39 @@ import {
   Phone,
   Bell,
   Sun,
-  Moon
+  Moon,
+  ShoppingBag
 } from 'lucide-react';
 
 const menuItems = [
-  { icon: LayoutDashboard, label: 'Tableau de bord', path: '/dashboard', color: 'text-primary' },
-  { icon: FileText, label: 'Documents', path: '/documents', color: 'text-blue-500' },
-  { icon: FolderKanban, label: 'Projets', path: '/projects', color: 'text-indigo-500' },
-  { icon: Brain, label: 'Quiz', path: '/quiz', color: 'text-violet-500' },
-  { icon: BookOpen, label: 'Flashcards', path: '/flashcards', color: 'text-pink-500' },
-  { icon: Sparkles, label: 'Résumés', path: '/summaries', color: 'text-amber-500' },
-  { icon: Map, label: 'Mind Maps', path: '/mindmap', color: 'text-emerald-500' },
-  { icon: MessageSquare, label: 'EXABOT', path: '/chat', color: 'text-fuchsia-500' },
-  { icon: Calendar, label: 'Planning', path: '/planning', color: 'text-cyan-500' },
-  { icon: Target, label: 'Compétences', path: '/skills', color: 'text-orange-500' },
-  { icon: Languages, label: 'Reformuler', path: '/rephrase', color: 'text-teal-500' },
-  { icon: ClipboardList, label: 'Exercices', path: '/exercises', color: 'text-rose-500' },
-  { icon: GraduationCap, label: 'Examens blancs', path: '/mock-exam', color: 'text-red-500' },
-  { icon: Presentation, label: 'Présentations', path: '/presentations', color: 'text-sky-500' },
+  { icon: LayoutDashboard, label: 'Tableau de bord', path: '/dashboard', gradient: 'from-primary to-secondary' },
+  { icon: FileText, label: 'Documents', path: '/documents', gradient: 'from-blue-500 to-cyan-500' },
+  { icon: FolderKanban, label: 'Projets', path: '/projects', gradient: 'from-indigo-500 to-blue-500' },
+  { icon: Brain, label: 'Quiz', path: '/quiz', gradient: 'from-violet-500 to-purple-600' },
+  { icon: BookOpen, label: 'Flashcards', path: '/flashcards', gradient: 'from-pink-500 to-rose-500' },
+  { icon: Sparkles, label: 'Résumés', path: '/summaries', gradient: 'from-amber-500 to-orange-500' },
+  { icon: Map, label: 'Mind Maps', path: '/mindmap', gradient: 'from-emerald-500 to-teal-500' },
+  { icon: MessageSquare, label: 'EXABOT', path: '/chat', gradient: 'from-fuchsia-500 to-pink-500' },
+  { icon: Calendar, label: 'Planning', path: '/planning', gradient: 'from-cyan-500 to-sky-500' },
+  { icon: Target, label: 'Compétences', path: '/skills', gradient: 'from-orange-500 to-red-500' },
+  { icon: Languages, label: 'Reformuler', path: '/rephrase', gradient: 'from-teal-500 to-emerald-500' },
+  { icon: ClipboardList, label: 'Exercices', path: '/exercises', gradient: 'from-rose-500 to-pink-500' },
+  { icon: GraduationCap, label: 'Examens blancs', path: '/mock-exam', gradient: 'from-red-500 to-rose-600' },
+  { icon: Presentation, label: 'Présentations', path: '/presentations', gradient: 'from-sky-500 to-blue-500' },
+  { icon: ShoppingBag, label: 'Marketplace', path: '/marketplace', gradient: 'from-fuchsia-500 to-rose-500' },
 ];
 
 const bottomMenuItems = [
-  { icon: User, label: 'Profil', path: '/profile', color: 'text-primary' },
-  { icon: CreditCard, label: 'Abonnement', path: '/subscription', color: 'text-amber-500' },
-  { icon: Bell, label: 'Notifications', path: '/notifications', color: 'text-orange-500' },
-  { icon: HelpCircle, label: 'Aide', path: '/help', color: 'text-cyan-500' },
-  { icon: Phone, label: 'Contact', path: '/contact', color: 'text-emerald-500' },
-  { icon: Settings, label: 'Paramètres', path: '/settings', color: 'text-muted-foreground' },
+  { icon: User, label: 'Profil', path: '/profile', gradient: 'from-primary to-secondary' },
+  { icon: CreditCard, label: 'Abonnement', path: '/subscription', gradient: 'from-amber-500 to-orange-500' },
+  { icon: Bell, label: 'Notifications', path: '/notifications', gradient: 'from-orange-500 to-rose-500' },
+  { icon: HelpCircle, label: 'Aide', path: '/help', gradient: 'from-cyan-500 to-sky-500' },
+  { icon: Phone, label: 'Contact', path: '/contact', gradient: 'from-emerald-500 to-teal-500' },
+  { icon: Settings, label: 'Paramètres', path: '/settings', gradient: 'from-slate-500 to-zinc-600' },
 ];
+
+
+
 
 export const Sidebar = () => {
   const navigate = useNavigate();
@@ -75,7 +80,7 @@ export const Sidebar = () => {
     navigate('/');
   };
 
-  const NavItem = ({ icon: Icon, label, path, color }: { icon: any; label: string; path: string; color?: string }) => {
+  const NavItem = ({ icon: Icon, label, path, gradient }: { icon: any; label: string; path: string; gradient?: string }) => {
     const isActive = location.pathname === path;
 
     return (
@@ -90,12 +95,12 @@ export const Sidebar = () => {
         )}
       >
         <div className={cn(
-          "w-9 h-9 flex items-center justify-center rounded-md transition-all duration-200 flex-shrink-0",
-          isActive
-            ? "bg-accent text-accent-foreground shadow-sm"
-            : cn("bg-muted/40 group-hover:bg-muted/70", color)
+          "relative w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-200 flex-shrink-0 ring-1 ring-white/10 shadow-sm",
+          "bg-gradient-to-br",
+          gradient || "from-primary to-secondary",
+          isActive && "scale-105 shadow-md"
         )}>
-          <Icon className="w-4 h-4" />
+          <Icon className="w-4 h-4 text-white drop-shadow-sm" strokeWidth={2.25} />
         </div>
         <span className="text-sm font-medium truncate">{label}</span>
         {isActive && (
@@ -104,6 +109,7 @@ export const Sidebar = () => {
       </button>
     );
   };
+
 
   return (
     <>
@@ -170,7 +176,7 @@ export const Sidebar = () => {
                   Admin
                 </span>
               </div>
-              <NavItem icon={Shield} label="Administration" path="/admin" />
+              <NavItem icon={Shield} label="Administration" path="/admin" gradient="from-red-600 to-rose-700" />
             </>
           )}
         </nav>
