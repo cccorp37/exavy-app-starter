@@ -359,7 +359,13 @@ const Admin = () => {
                 <Badge className="ml-2 bg-destructive">{openTickets}</Badge>
               )}
             </TabsTrigger>
+            <TabsTrigger value="marketplace">Marketplace</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="marketplace">
+            <AdminMarketplaceManager />
+          </TabsContent>
+
 
           <TabsContent value="users">
             <Card>
