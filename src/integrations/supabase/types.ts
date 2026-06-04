@@ -284,6 +284,101 @@ export type Database = {
           },
         ]
       }
+      marketplace_items: {
+        Row: {
+          category: string | null
+          cover_url: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          download_url: string
+          id: string
+          is_published: boolean
+          price_fcfa: number
+          price_usd: number | null
+          title: string
+          type: Database["public"]["Enums"]["marketplace_item_type"]
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          cover_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          download_url: string
+          id?: string
+          is_published?: boolean
+          price_fcfa?: number
+          price_usd?: number | null
+          title: string
+          type?: Database["public"]["Enums"]["marketplace_item_type"]
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          cover_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          download_url?: string
+          id?: string
+          is_published?: boolean
+          price_fcfa?: number
+          price_usd?: number | null
+          title?: string
+          type?: Database["public"]["Enums"]["marketplace_item_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      marketplace_purchases: {
+        Row: {
+          amount_fcfa: number
+          completed_at: string | null
+          created_at: string
+          id: string
+          item_id: string
+          payment_method: string | null
+          payment_reference: string | null
+          status: Database["public"]["Enums"]["marketplace_purchase_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_fcfa: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          item_id: string
+          payment_method?: string | null
+          payment_reference?: string | null
+          status?: Database["public"]["Enums"]["marketplace_purchase_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_fcfa?: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          item_id?: string
+          payment_method?: string | null
+          payment_reference?: string | null
+          status?: Database["public"]["Enums"]["marketplace_purchase_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_purchases_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mind_maps: {
         Row: {
           created_at: string
@@ -1182,6 +1277,10 @@ export type Database = {
       }
       cleanup_expired_otp_codes: { Args: never; Returns: undefined }
       cleanup_old_sessions: { Args: never; Returns: undefined }
+      get_marketplace_download_url: {
+        Args: { p_item_id: string }
+        Returns: string
+      }
       get_plan_limits: {
         Args: { plan_type: Database["public"]["Enums"]["subscription_plan"] }
         Returns: Json
@@ -1206,6 +1305,8 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      marketplace_item_type: "ebook" | "training"
+      marketplace_purchase_status: "pending" | "completed" | "failed"
       subscription_plan: "free" | "monthly" | "yearly"
       subscription_status: "active" | "expired" | "cancelled" | "pending"
     }
@@ -1336,6 +1437,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      marketplace_item_type: ["ebook", "training"],
+      marketplace_purchase_status: ["pending", "completed", "failed"],
       subscription_plan: ["free", "monthly", "yearly"],
       subscription_status: ["active", "expired", "cancelled", "pending"],
     },
