@@ -46,7 +46,7 @@ export const MarketplacePaymentDialog = ({ open, onOpenChange, itemId, itemTitle
         if (data.status === "SUCCESSFUL") {
           setStatus("success");
           // fetch download url via RPC
-          const { data: urlData } = await supabase.rpc("get_marketplace_download_url", { p_item_id: itemId });
+          const { data: urlData } = await (supabase as any).rpc("get_marketplace_download_url", { p_item_id: itemId });
           if (urlData) setDownloadUrl(urlData as string);
           onSuccess?.();
           toast({ title: "Paiement réussi !", description: "Votre lien de téléchargement est disponible." });

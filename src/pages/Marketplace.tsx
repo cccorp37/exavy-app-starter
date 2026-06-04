@@ -32,12 +32,12 @@ const Marketplace = () => {
   const load = async () => {
     setLoading(true);
     const [{ data: itemsData }, { data: purchaseData }] = await Promise.all([
-      supabase.from("marketplace_items")
+      (supabase as any).from("marketplace_items")
         .select("id, type, title, description, category, price_fcfa, cover_url")
         .eq("is_published", true)
         .order("created_at", { ascending: false }),
       user
-        ? supabase.from("marketplace_purchases").select("item_id").eq("user_id", user.id).eq("status", "completed")
+        ? (supabase as any).from("marketplace_purchases").select("item_id").eq("user_id", user.id).eq("status", "completed")
         : Promise.resolve({ data: [] as any[] }),
     ]);
     setItems((itemsData ?? []) as Item[]);
@@ -48,7 +48,7 @@ const Marketplace = () => {
   useEffect(() => { load(); }, [user]);
 
   const download = async (id: string) => {
-    const { data, error } = await supabase.rpc("get_marketplace_download_url", { p_item_id: id });
+    const { data, error } = await (supabase as any).rpc("get_marketplace_download_url", { p_item_id: id });
     if (error || !data) {
       toast({ variant: "destructive", title: "Téléchargement indisponible", description: error?.message });
       return;

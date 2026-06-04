@@ -92,8 +92,8 @@ export const AdminMarketplaceManager = () => {
       created_by: user?.id,
     };
     const { error } = editing
-      ? await supabase.from("marketplace_items").update(payload).eq("id", editing.id)
-      : await supabase.from("marketplace_items").insert(payload);
+      ? await (supabase as any).from("marketplace_items").update(payload).eq("id", editing.id)
+      : await (supabase as any).from("marketplace_items").insert(payload);
     if (error) {
       toast.error(error.message);
       return;
@@ -105,14 +105,14 @@ export const AdminMarketplaceManager = () => {
 
   const remove = async (id: string) => {
     if (!confirm("Supprimer cet article ?")) return;
-    const { error } = await supabase.from("marketplace_items").delete().eq("id", id);
+    const { error } = await (supabase as any).from("marketplace_items").delete().eq("id", id);
     if (error) { toast.error(error.message); return; }
     toast.success("Supprimé");
     load();
   };
 
   const togglePublish = async (item: Item) => {
-    const { error } = await supabase.from("marketplace_items")
+    const { error } = await (supabase as any).from("marketplace_items")
       .update({ is_published: !item.is_published }).eq("id", item.id);
     if (error) { toast.error(error.message); return; }
     load();
