@@ -48,12 +48,14 @@ const Marketplace = () => {
   useEffect(() => { load(); }, [user]);
 
   const download = async (id: string) => {
-    const { data, error } = await (supabase as any).rpc("get_marketplace_download_url", { p_item_id: id });
-    if (error || !data) {
-      toast({ variant: "destructive", title: "Téléchargement indisponible", description: error?.message });
+    const { data, error } = await supabase.functions.invoke("marketplace-sign-download", {
+      body: { itemId: id },
+    });
+    if (error || !data?.url) {
+      toast({ variant: "destructive", title: "Téléchargement indisponible", description: error?.message || data?.error });
       return;
     }
-    window.open(data as string, "_blank", "noopener,noreferrer");
+    window.open(data.url as string, "_blank", "noopener,noreferrer");
   };
 
   const filtered = filter === "all" ? items : items.filter((i) => i.type === filter);
