@@ -24,6 +24,7 @@ interface Item {
   download_url: string;
   is_published: boolean;
   created_at: string;
+  marketplace_item_downloads?: { download_url: string } | { download_url: string }[] | null;
 }
 
 const emptyForm = {
@@ -49,10 +50,19 @@ export const AdminMarketplaceManager = () => {
     setLoading(true);
     const { data, error } = await (supabase as any)
       .from("marketplace_items")
-      .select("*")
+      .select("id, type, title, description, category, price_fcfa, cover_url, is_published, created_at, marketplace_item_downloads(download_url)")
       .order("created_at", { ascending: false });
     if (error) toast.error("Erreur de chargement");
-    setItems((data ?? []) as Item[]);
+    const normalized = (data ?? []).map((item: Item) => {
+      const downloadRelation = Array.isArray(item.marketplace_item_downloads)
+        ? item.marketplace_item_downloads[0]
+        : item.marketplace_item_downloads;
+      return {
+        ...item,
+        download_url: downloadRelation?.download_url ?? "",
+      };
+    });
+    setItems(normalized as Item[]);
     setLoading(false);
   };
 
@@ -84,18 +94,27 @@ export const AdminMarketplaceManager = () => {
       toast.error("Titre, lien de téléchargement et prix sont requis");
       return;
     }
+    const { download_url, ...itemForm } = form;
     const payload = {
-      ...form,
+      ...itemForm,
       description: form.description || null,
       category: form.category || null,
       cover_url: form.cover_url || null,
       created_by: user?.id,
     };
-    const { error } = editing
-      ? await (supabase as any).from("marketplace_items").update(payload).eq("id", editing.id)
-      : await (supabase as any).from("marketplace_items").insert(payload);
+    const savedItem = editing
+      ? await (supabase as any).from("marketplace_items").update(payload).eq("id", editing.id).select("id").single()
+      : await (supabase as any).from("marketplace_items").insert(payload).select("id").single();
+    const { data: itemData, error } = savedItem;
     if (error) {
       toast.error(error.message);
+      return;
+    }
+    const { error: downloadError } = await (supabase as any)
+      .from("marketplace_item_downloads")
+      .upsert({ item_id: itemData.id, download_url });
+    if (downloadError) {
+      toast.error(downloadError.message);
       return;
     }
     toast.success(editing ? "Article mis à jour" : "Article publié");
