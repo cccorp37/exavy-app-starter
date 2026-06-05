@@ -284,6 +284,35 @@ export type Database = {
           },
         ]
       }
+      marketplace_item_downloads: {
+        Row: {
+          created_at: string
+          download_url: string
+          item_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          download_url: string
+          item_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          download_url?: string
+          item_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_item_downloads_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: true
+            referencedRelation: "marketplace_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       marketplace_items: {
         Row: {
           category: string | null
@@ -291,7 +320,6 @@ export type Database = {
           created_at: string
           created_by: string | null
           description: string | null
-          download_url: string
           id: string
           is_published: boolean
           price_fcfa: number
@@ -306,7 +334,6 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           description?: string | null
-          download_url: string
           id?: string
           is_published?: boolean
           price_fcfa?: number
@@ -321,7 +348,6 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           description?: string | null
-          download_url?: string
           id?: string
           is_published?: boolean
           price_fcfa?: number
