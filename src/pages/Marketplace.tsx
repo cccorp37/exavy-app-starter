@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { GradientIcon } from "@/components/ui/gradient-icon";
 import { BookOpen, GraduationCap, Download, ShoppingBag, Sparkles } from "lucide-react";
 import { MarketplacePaymentDialog } from "@/components/marketplace/MarketplacePaymentDialog";
+import { MarketplaceCover } from "@/components/marketplace/MarketplaceCover";
 import { useToast } from "@/hooks/use-toast";
 
 interface Item {
