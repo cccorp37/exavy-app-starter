@@ -119,8 +119,8 @@ export const AdminMarketplaceManager = () => {
         cacheControl: "3600", upsert: false, contentType: file.type,
       });
       if (error) throw error;
-      const { data: pub } = supabase.storage.from("marketplace-covers").getPublicUrl(path);
-      setForm((f) => ({ ...f, cover_url: pub.publicUrl }));
+      // Store the storage path; resolved to signed URL at display time.
+      setForm((f) => ({ ...f, cover_url: path }));
       toast.success("Couverture téléversée");
     } catch (e: any) {
       toast.error(e.message || "Erreur téléversement");
@@ -128,6 +128,18 @@ export const AdminMarketplaceManager = () => {
       setUploadingCover(false);
     }
   };
+
+  // Local preview of the saved cover (handles both http URLs and storage paths).
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { resolveCoverUrl } = await import("@/lib/marketplace-covers");
+      const url = await resolveCoverUrl(form.cover_url);
+      if (!cancelled) setCoverPreview(url);
+    })();
+    return () => { cancelled = true; };
+  }, [form.cover_url]);
 
   const uploadFile = async (file: File) => {
     if (!user) return;
