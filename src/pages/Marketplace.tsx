@@ -101,14 +101,16 @@ const Marketplace = () => {
               return (
                 <Card key={item.id} className="overflow-hidden flex flex-col group hover:shadow-xl transition-shadow">
                   <div className="relative aspect-[16/10] bg-gradient-to-br from-muted to-muted/40 overflow-hidden">
-                    {item.cover_url ? (
-                      <img src={item.cover_url} alt={item.title} loading="lazy"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <GradientIcon icon={Icon} gradient={gradient} size="xl" />
-                      </div>
-                    )}
+                    <MarketplaceCover
+                      value={item.cover_url}
+                      alt={item.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      fallback={
+                        <div className="w-full h-full flex items-center justify-center">
+                          <GradientIcon icon={Icon} gradient={gradient} size="xl" />
+                        </div>
+                      }
+                    />
                     <Badge className="absolute top-3 left-3 capitalize">{item.type === "training" ? "Formation" : "Ebook"}</Badge>
                   </div>
                   <CardContent className="p-4 flex flex-col gap-3 flex-1">
