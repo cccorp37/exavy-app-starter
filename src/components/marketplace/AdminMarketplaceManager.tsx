@@ -13,6 +13,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, BookOpen, GraduationCap, Upload, Link as LinkIcon, Image as ImageIcon, FileUp, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { MarketplaceCover } from "./MarketplaceCover";
 
 interface DownloadRow {
   download_url: string | null;
@@ -119,8 +120,8 @@ export const AdminMarketplaceManager = () => {
         cacheControl: "3600", upsert: false, contentType: file.type,
       });
       if (error) throw error;
-      const { data: pub } = supabase.storage.from("marketplace-covers").getPublicUrl(path);
-      setForm((f) => ({ ...f, cover_url: pub.publicUrl }));
+      // Store the storage path; resolved to signed URL at display time.
+      setForm((f) => ({ ...f, cover_url: path }));
       toast.success("Couverture téléversée");
     } catch (e: any) {
       toast.error(e.message || "Erreur téléversement");
@@ -128,6 +129,18 @@ export const AdminMarketplaceManager = () => {
       setUploadingCover(false);
     }
   };
+
+  // Local preview of the saved cover (handles both http URLs and storage paths).
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { resolveCoverUrl } = await import("@/lib/marketplace-covers");
+      const url = await resolveCoverUrl(form.cover_url);
+      if (!cancelled) setCoverPreview(url);
+    })();
+    return () => { cancelled = true; };
+  }, [form.cover_url]);
 
   const uploadFile = async (file: File) => {
     if (!user) return;
@@ -228,9 +241,12 @@ export const AdminMarketplaceManager = () => {
               return (
                 <div key={item.id} className="flex items-center gap-4 p-3 border rounded-lg">
                   <div className="w-14 h-14 rounded-lg bg-muted overflow-hidden flex items-center justify-center shrink-0">
-                    {item.cover_url
-                      ? <img src={item.cover_url} alt="" className="w-full h-full object-cover" />
-                      : <Icon className="w-6 h-6 text-muted-foreground" />}
+                    <MarketplaceCover
+                      value={item.cover_url}
+                      alt=""
+                      className="w-full h-full object-cover"
+                      fallback={<Icon className="w-6 h-6 text-muted-foreground" />}
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -289,8 +305,8 @@ export const AdminMarketplaceManager = () => {
                   {uploadingCover ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageIcon className="w-4 h-4" />}
                 </Button>
               </div>
-              {form.cover_url && (
-                <img src={form.cover_url} alt="" className="w-full h-32 object-cover rounded border" />
+              {coverPreview && (
+                <img src={coverPreview} alt="" className="w-full h-32 object-cover rounded border" />
               )}
             </div>
 
