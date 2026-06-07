@@ -240,9 +240,12 @@ export const AdminMarketplaceManager = () => {
               return (
                 <div key={item.id} className="flex items-center gap-4 p-3 border rounded-lg">
                   <div className="w-14 h-14 rounded-lg bg-muted overflow-hidden flex items-center justify-center shrink-0">
-                    {item.cover_url
-                      ? <img src={item.cover_url} alt="" className="w-full h-full object-cover" />
-                      : <Icon className="w-6 h-6 text-muted-foreground" />}
+                    <MarketplaceCover
+                      value={item.cover_url}
+                      alt=""
+                      className="w-full h-full object-cover"
+                      fallback={<Icon className="w-6 h-6 text-muted-foreground" />}
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
