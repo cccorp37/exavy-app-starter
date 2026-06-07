@@ -301,8 +301,8 @@ export const AdminMarketplaceManager = () => {
                   {uploadingCover ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageIcon className="w-4 h-4" />}
                 </Button>
               </div>
-              {form.cover_url && (
-                <img src={form.cover_url} alt="" className="w-full h-32 object-cover rounded border" />
+              {coverPreview && (
+                <img src={coverPreview} alt="" className="w-full h-32 object-cover rounded border" />
               )}
             </div>
 
