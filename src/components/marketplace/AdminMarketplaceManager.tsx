@@ -13,6 +13,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, BookOpen, GraduationCap, Upload, Link as LinkIcon, Image as ImageIcon, FileUp, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { MarketplaceCover } from "./MarketplaceCover";
 
 interface DownloadRow {
   download_url: string | null;
