@@ -66,13 +66,14 @@ export function GenerateExamDialog({
 }: GenerateExamDialogProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isPremium, isAdmin } = useSubscription();
+  const { isPremium, isAdmin, loading: subscriptionLoading } = useSubscription();
   const [isGenerating, setIsGenerating] = useState(false);
   const [examType, setExamType] = useState('custom');
   const [subject, setSubject] = useState('other');
   const [difficulty, setDifficulty] = useState('medium');
   const [duration, setDuration] = useState(60);
   const [questionCount, setQuestionCount] = useState([10]);
+  const hasPremiumAccess = isPremium() || isAdmin;
 
   const handleGenerate = async () => {
     if (!user) {
@@ -81,7 +82,7 @@ export function GenerateExamDialog({
     }
 
     // Admin users and premium users can access
-    if (!isPremium() && !isAdmin) {
+    if (!hasPremiumAccess) {
       toast.error('Cette fonctionnalité nécessite un abonnement Premium');
       return;
     }
@@ -126,7 +127,19 @@ export function GenerateExamDialog({
     }
   };
 
-  if (!isPremium() && !isAdmin) {
+  if (subscriptionLoading) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-md">
+          <div className="flex items-center justify-center gap-3 py-8 text-muted-foreground">
+            <Loader2 className="h-5 w-5 animate-spin" /> Vérification de l’accès…
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  if (!hasPremiumAccess) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-md">
