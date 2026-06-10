@@ -287,20 +287,23 @@ export type Database = {
       marketplace_item_downloads: {
         Row: {
           created_at: string
-          download_url: string
+          download_url: string | null
           item_id: string
+          storage_path: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
-          download_url: string
+          download_url?: string | null
           item_id: string
+          storage_path?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
-          download_url?: string
+          download_url?: string | null
           item_id?: string
+          storage_path?: string | null
           updated_at?: string
         }
         Relationships: [

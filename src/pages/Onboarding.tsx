@@ -70,8 +70,11 @@ const Onboarding = () => {
       }, { onConflict: 'user_id' });
 
       if (error) throw error;
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem(`exavy:onboarding-completed:${user.id}`, "true");
+      }
       toast.success("Profil configuré avec succès !");
-      navigate("/dashboard");
+      navigate("/dashboard", { replace: true });
     } catch (error) {
       console.error("Onboarding error:", error);
       toast.error("Erreur lors de la configuration du profil");
