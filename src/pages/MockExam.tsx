@@ -32,7 +32,8 @@ import {
   Target,
   Pen,
   ArrowLeft,
-  Printer
+  Printer,
+  GraduationCap
 } from 'lucide-react';
 import { PrintableExam } from '@/components/exam/PrintableExam';
 import { toast } from 'sonner';
