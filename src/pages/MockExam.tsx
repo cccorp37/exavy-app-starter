@@ -64,6 +64,7 @@ interface MockExamData {
   user_score: number | null;
   user_answers: Record<string, string>;
   ai_feedback: any;
+  created_at?: string;
 }
 
 const examTypeLabels: Record<string, string> = {
@@ -78,6 +79,7 @@ const MockExam = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [exam, setExam] = useState<MockExamData | null>(null);
+  const [examList, setExamList] = useState<MockExamData[]>([]);
   const [loading, setLoading] = useState(true);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -87,8 +89,30 @@ const MockExam = () => {
   const [showResults, setShowResults] = useState(false);
 
   useEffect(() => {
-    if (examId && user) fetchExam();
+    if (!user) return;
+    if (examId) {
+      fetchExam();
+    } else {
+      fetchExamList();
+    }
   }, [examId, user]);
+
+  const fetchExamList = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('mock_exams')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      toast.error('Impossible de charger les examens');
+      setExamList([]);
+    } else {
+      setExamList((data ?? []) as unknown as MockExamData[]);
+    }
+    setExam(null);
+    setLoading(false);
+  };
 
   // Timer
   useEffect(() => {
@@ -192,6 +216,61 @@ const MockExam = () => {
       <MainLayout>
         <div className="flex items-center justify-center h-full">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (!examId) {
+    return (
+      <MainLayout>
+        <div className="max-w-5xl mx-auto space-y-5 p-4 md:p-6">
+          <div className="bg-card border-2 border-foreground/20 rounded-sm shadow-lg overflow-hidden">
+            <div className="bg-primary text-primary-foreground px-6 py-2 text-center">
+              <p className="text-xs font-semibold tracking-[0.3em] uppercase">Examens blancs</p>
+            </div>
+            <div className="p-6 md:p-8 space-y-5">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl md:text-3xl font-bold uppercase tracking-tight">Mes épreuves générées</h1>
+                  <p className="text-sm text-muted-foreground mt-1">Retrouvez vos examens blancs et leurs corrections.</p>
+                </div>
+                <Button onClick={() => navigate('/documents')}>
+                  <FileText className="w-4 h-4 mr-2" /> Générer depuis un document
+                </Button>
+              </div>
+
+              {examList.length === 0 ? (
+                <div className="border-2 border-dashed border-foreground/20 rounded-sm p-8 text-center space-y-3">
+                  <GraduationCap className="w-12 h-12 mx-auto text-muted-foreground" />
+                  <p className="font-semibold">Aucun examen blanc pour le moment.</p>
+                  <p className="text-sm text-muted-foreground">Importez ou ouvrez un document, puis utilisez l’option “Générer un examen blanc”.</p>
+                </div>
+              ) : (
+                <div className="grid gap-3">
+                  {examList.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => navigate(`/mock-exam/${item.id}`)}
+                      className="text-left border-2 border-foreground/10 rounded-sm p-4 hover:border-primary/60 hover:bg-primary/5 transition-colors"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="font-bold truncate">{item.title}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {examTypeLabels[item.exam_type] || 'Examen'} • {item.duration_minutes} min • {item.total_points} pts
+                          </p>
+                        </div>
+                        <Badge variant={item.status === 'completed' ? 'default' : 'outline'}>
+                          {item.status === 'completed' ? 'Corrigé' : item.status === 'in_progress' ? 'En cours' : 'Prêt'}
+                        </Badge>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </MainLayout>
     );

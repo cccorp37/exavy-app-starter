@@ -24,6 +24,14 @@ const recordUserSession = async (_user: User) => {
   }
 };
 
+const ensureTrialSubscription = async () => {
+  try {
+    await supabase.functions.invoke('create-trial-subscription');
+  } catch (error) {
+    console.error('Error ensuring trial subscription:', error);
+  }
+};
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -36,6 +44,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      if (session?.user && !sessionRecorded.current) {
+        sessionRecorded.current = true;
+        recordUserSession(session.user);
+        ensureTrialSubscription();
+      }
     });
 
     // Listen for auth changes
@@ -48,6 +61,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (event === 'SIGNED_IN' && session?.user && !sessionRecorded.current) {
         sessionRecorded.current = true;
         recordUserSession(session.user);
+        ensureTrialSubscription();
       }
       
       if (event === 'SIGNED_OUT') {

@@ -91,9 +91,13 @@ serve(async (req) => {
         .select('plan, status, expires_at')
         .eq('user_id', userId)
         .eq('status', 'active')
-        .single();
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
-      const isPremium = subscription?.plan === 'monthly' || subscription?.plan === 'yearly';
+      const isPremium =
+        (subscription?.plan === 'monthly' || subscription?.plan === 'yearly') &&
+        (!subscription?.expires_at || new Date(subscription.expires_at) > new Date());
       if (!isPremium) {
         return new Response(
           JSON.stringify({ error: 'Premium subscription required', isPremium: false }),
@@ -218,7 +222,7 @@ Réponds avec ce format JSON exact:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-3-flash-preview',
+        model: 'google/gemini-2.5-flash',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
@@ -296,12 +300,20 @@ Réponds avec ce format JSON exact:
       }
     }
 
-    if (!examData || !examData.questions) {
+    if (!examData || !Array.isArray(examData.questions) || examData.questions.length === 0) {
       return new Response(
         JSON.stringify({ error: 'Failed to generate exam structure' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    const normalizedQuestions = examData.questions.map((question: ExamQuestion, index: number) => ({
+      ...question,
+      id: question.id || `q${index + 1}`,
+      type: question.type || 'open',
+      points: Number(question.points || Math.max(1, Math.round(20 / examData.questions.length))),
+      difficulty: question.difficulty || difficulty || 'medium',
+    }));
 
     // Save the exam to database
     const { data: savedExam, error: saveError } = await supabase
@@ -314,7 +326,7 @@ Réponds avec ce format JSON exact:
         subject: subject,
         duration_minutes: durationMinutes || 120,
         total_points: examData.totalPoints || 20,
-        questions: examData.questions,
+        questions: normalizedQuestions,
         grading_scale: examData.gradingScale || {},
         instructions: examData.instructions,
         difficulty: difficulty || 'medium',
