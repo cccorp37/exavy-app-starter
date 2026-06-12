@@ -181,7 +181,7 @@ const Subscription = () => {
         <div className="flex flex-wrap justify-center gap-3 mb-8">
           <Badge variant="secondary" className="gap-2 px-4 py-2">
             <Smartphone className="w-4 h-4" />
-            Campay (Cameroun)
+            PayUnit (Cameroun)
           </Badge>
           <Badge variant="secondary" className="gap-2 px-4 py-2">
             <Globe className="w-4 h-4" />
