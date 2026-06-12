@@ -1,4 +1,4 @@
-// Marketplace checkout via PayUnit hosted page
+// PayUnit subscription payment (hosted page flow)
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -8,14 +8,18 @@ const corsHeaders = {
 
 const PAYUNIT_BASE = "https://gateway.payunit.net";
 
-function payunitHeaders() {
+function authHeader(): string {
   const user = Deno.env.get("PAYUNIT_API_USER") ?? "";
   const pass = Deno.env.get("PAYUNIT_API_PASSWORD") ?? "";
+  return "Basic " + btoa(`${user}:${pass}`);
+}
+
+function payunitHeaders() {
   return {
     "Content-Type": "application/json",
     "x-api-key": Deno.env.get("PAYUNIT_API_KEY") ?? "",
     mode: Deno.env.get("PAYUNIT_MODE") ?? "live",
-    Authorization: "Basic " + btoa(`${user}:${pass}`),
+    Authorization: authHeader(),
   };
 }
 
@@ -31,41 +35,55 @@ Deno.serve(async (req) => {
 
     if (action === "status") {
       const { reference } = await req.json();
-      const r = await fetch(`${PAYUNIT_BASE}/api/gateway/paymentstatus/${reference}`, {
-        headers: payunitHeaders(),
-      });
-      const data = await r.json();
+      if (!reference) {
+        return new Response(JSON.stringify({ error: "Missing reference" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const statusRes = await fetch(
+        `${PAYUNIT_BASE}/api/gateway/paymentstatus/${reference}`,
+        { headers: payunitHeaders() },
+      );
+      const data = await statusRes.json();
       const txStatus =
         data?.data?.transaction_status ||
         data?.transaction_status ||
         data?.status ||
         "PENDING";
 
-      if (txStatus === "SUCCESS") {
+      // Find subscription pending row
+      const { data: subRows } = await admin
+        .from("subscriptions")
+        .select("id, user_id, plan, metadata")
+        .contains("metadata", { payment_reference: reference } as any)
+        .limit(1);
+
+      const sub = subRows?.[0];
+
+      if (txStatus === "SUCCESS" && sub) {
+        const isYearly = sub.plan === "yearly";
+        const expires = new Date();
+        expires.setMonth(expires.getMonth() + (isYearly ? 12 : 1));
         await admin
-          .from("marketplace_purchases")
-          .update({ status: "completed", completed_at: new Date().toISOString() })
-          .eq("payment_reference", reference);
-      } else if (txStatus === "FAILED" || txStatus === "CANCELLED") {
-        await admin
-          .from("marketplace_purchases")
-          .update({ status: "failed" })
-          .eq("payment_reference", reference);
+          .from("subscriptions")
+          .update({
+            status: "active",
+            started_at: new Date().toISOString(),
+            expires_at: expires.toISOString(),
+          })
+          .eq("id", sub.id);
+      } else if ((txStatus === "FAILED" || txStatus === "CANCELLED") && sub) {
+        await admin.from("subscriptions").update({ status: "cancelled" }).eq("id", sub.id);
       }
 
-      // Map PayUnit statuses to the UI's expected values
-      const mapped =
-        txStatus === "SUCCESS"
-          ? "SUCCESSFUL"
-          : txStatus === "FAILED" || txStatus === "CANCELLED"
-            ? "FAILED"
-            : "PENDING";
-
-      return new Response(JSON.stringify({ status: mapped, reference }), {
+      return new Response(JSON.stringify({ status: txStatus, reference }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
+    // init
     const authH = req.headers.get("Authorization") || "";
     const jwt = authH.replace("Bearer ", "");
     const userClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
@@ -80,38 +98,26 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { itemId } = await req.json();
-    if (!itemId) {
-      return new Response(JSON.stringify({ error: "Missing itemId" }), {
+    const { planId, amount, returnUrl } = await req.json();
+    if (!planId || !amount) {
+      return new Response(JSON.stringify({ error: "Missing planId or amount" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const { data: item, error: itemErr } = await admin
-      .from("marketplace_items")
-      .select("id, title, price_fcfa, is_published")
-      .eq("id", itemId)
-      .maybeSingle();
-    if (itemErr || !item || !item.is_published) {
-      return new Response(JSON.stringify({ error: "Article introuvable" }), {
-        status: 404,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const transactionId = `exavy_mkt_${userId.slice(0, 8)}_${Date.now()}`;
-    const origin = req.headers.get("origin") || "https://exavy-app-starter.lovable.app";
+    const transactionId = `exavy_sub_${userId.slice(0, 8)}_${Date.now()}`;
+    const origin = returnUrl || req.headers.get("origin") || "https://exavy-app-starter.lovable.app";
 
     const initRes = await fetch(`${PAYUNIT_BASE}/api/gateway/initialize`, {
       method: "POST",
       headers: payunitHeaders(),
       body: JSON.stringify({
-        total_amount: Number(item.price_fcfa),
+        total_amount: Number(amount),
         currency: "XAF",
         transaction_id: transactionId,
-        return_url: `${origin}/marketplace?purchase=done`,
-        notify_url: `${supabaseUrl}/functions/v1/marketplace-checkout?action=webhook`,
+        return_url: `${origin}/subscription?payment=done`,
+        notify_url: `${supabaseUrl}/functions/v1/payunit-payment?action=webhook`,
         payment_country: "CM",
       }),
     });
@@ -125,13 +131,13 @@ Deno.serve(async (req) => {
       );
     }
 
-    await admin.from("marketplace_purchases").insert({
+    // create pending subscription
+    await admin.from("subscriptions").insert({
       user_id: userId,
-      item_id: itemId,
-      amount_fcfa: item.price_fcfa,
-      payment_method: "payunit",
-      payment_reference: transactionId,
+      plan: planId,
       status: "pending",
+      started_at: new Date().toISOString(),
+      metadata: { payment_reference: transactionId, provider: "payunit" } as any,
     });
 
     return new Response(
@@ -139,12 +145,11 @@ Deno.serve(async (req) => {
         success: true,
         reference: transactionId,
         paymentUrl: initData?.data?.transaction_url,
-        message: "Vous allez être redirigé vers la page de paiement PayUnit",
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
-    console.error("marketplace-checkout error", e);
+    console.error("payunit-payment error", e);
     return new Response(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

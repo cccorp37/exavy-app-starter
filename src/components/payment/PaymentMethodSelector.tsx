@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Smartphone, Globe, Check } from "lucide-react";
-import { CampayPaymentDialog } from "./CampayPaymentDialog";
+import { PayunitPaymentDialog } from "./PayunitPaymentDialog";
 import { PawapayPaymentDialog } from "./PawapayPaymentDialog";
 
 interface PaymentMethodSelectorProps {
@@ -23,7 +23,7 @@ interface PaymentMethodSelectorProps {
   onPaymentSuccess?: () => void;
 }
 
-type PaymentMethod = 'campay' | 'pawapay' | null;
+type PaymentMethod = "payunit" | "pawapay" | null;
 
 export function PaymentMethodSelector({
   open,
@@ -36,18 +36,14 @@ export function PaymentMethodSelector({
   onPaymentSuccess,
 }: PaymentMethodSelectorProps) {
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>(null);
-  const [showCampay, setShowCampay] = useState(false);
+  const [showPayunit, setShowPayunit] = useState(false);
   const [showPawapay, setShowPawapay] = useState(false);
 
-  const handleSelectMethod = (method: PaymentMethod) => {
-    setSelectedMethod(method);
-  };
-
   const handleContinue = () => {
-    if (selectedMethod === 'campay') {
-      setShowCampay(true);
+    if (selectedMethod === "payunit") {
+      setShowPayunit(true);
       onOpenChange(false);
-    } else if (selectedMethod === 'pawapay') {
+    } else if (selectedMethod === "pawapay") {
       setShowPawapay(true);
       onOpenChange(false);
     }
@@ -70,12 +66,12 @@ export function PaymentMethodSelector({
           </DialogHeader>
 
           <div className="space-y-4 py-4">
-            {/* Campay Option - Cameroon */}
-            <Card 
+            {/* PayUnit Option */}
+            <Card
               className={`cursor-pointer transition-all hover:border-primary ${
-                selectedMethod === 'campay' ? 'border-primary ring-2 ring-primary/20' : ''
+                selectedMethod === "payunit" ? "border-primary ring-2 ring-primary/20" : ""
               }`}
-              onClick={() => handleSelectMethod('campay')}
+              onClick={() => setSelectedMethod("payunit")}
             >
               <CardContent className="p-4">
                 <div className="flex items-start gap-4">
@@ -84,28 +80,24 @@ export function PaymentMethodSelector({
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-semibold">Campay</h3>
-                      {selectedMethod === 'campay' && (
-                        <Check className="h-5 w-5 text-primary" />
-                      )}
+                      <h3 className="font-semibold">PayUnit</h3>
+                      {selectedMethod === "payunit" && <Check className="h-5 w-5 text-primary" />}
                     </div>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Orange Money & MTN MoMo (Cameroun)
+                      Orange Money, MTN MoMo & cartes bancaires (Cameroun)
                     </p>
-                    <p className="text-sm font-medium mt-2">
-                      {amountXAF.toLocaleString()} FCFA
-                    </p>
+                    <p className="text-sm font-medium mt-2">{amountXAF.toLocaleString()} FCFA</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* PawaPay Option - International */}
-            <Card 
+            {/* PawaPay Option */}
+            <Card
               className={`cursor-pointer transition-all hover:border-primary ${
-                selectedMethod === 'pawapay' ? 'border-primary ring-2 ring-primary/20' : ''
+                selectedMethod === "pawapay" ? "border-primary ring-2 ring-primary/20" : ""
               }`}
-              onClick={() => handleSelectMethod('pawapay')}
+              onClick={() => setSelectedMethod("pawapay")}
             >
               <CardContent className="p-4">
                 <div className="flex items-start gap-4">
@@ -115,16 +107,12 @@ export function PaymentMethodSelector({
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
                       <h3 className="font-semibold">PawaPay</h3>
-                      {selectedMethod === 'pawapay' && (
-                        <Check className="h-5 w-5 text-primary" />
-                      )}
+                      {selectedMethod === "pawapay" && <Check className="h-5 w-5 text-primary" />}
                     </div>
                     <p className="text-sm text-muted-foreground mt-1">
-                      MTN, Orange, Airtel... (19+ pays africains)
+                      MTN, Orange, Airtel… (19+ pays africains)
                     </p>
-                    <p className="text-sm font-medium mt-2">
-                      {amountUSD} USD
-                    </p>
+                    <p className="text-sm font-medium mt-2">{amountUSD} USD</p>
                   </div>
                 </div>
               </CardContent>
@@ -135,21 +123,16 @@ export function PaymentMethodSelector({
             <Button variant="outline" onClick={handleClose} className="flex-1">
               Annuler
             </Button>
-            <Button 
-              onClick={handleContinue} 
-              disabled={!selectedMethod}
-              className="flex-1"
-            >
+            <Button onClick={handleContinue} disabled={!selectedMethod} className="flex-1">
               Continuer
             </Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Campay Dialog */}
-      <CampayPaymentDialog
-        open={showCampay}
-        onOpenChange={setShowCampay}
+      <PayunitPaymentDialog
+        open={showPayunit}
+        onOpenChange={setShowPayunit}
         planId={planId}
         planName={planName}
         amount={amountXAF}
@@ -157,7 +140,6 @@ export function PaymentMethodSelector({
         onPaymentSuccess={onPaymentSuccess}
       />
 
-      {/* PawaPay Dialog */}
       <PawapayPaymentDialog
         open={showPawapay}
         onOpenChange={setShowPawapay}
