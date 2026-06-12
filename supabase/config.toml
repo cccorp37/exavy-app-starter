@@ -21,7 +21,10 @@ verify_jwt = false
 [functions.analyze-image]
 verify_jwt = false
 
-[functions.campay-payment]
+[functions.payunit-payment]
+verify_jwt = false
+
+[functions.marketplace-checkout]
 verify_jwt = false
 
 [functions.generate-daily-tip]
