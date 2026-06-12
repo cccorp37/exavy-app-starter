@@ -53,11 +53,11 @@ Deno.serve(async (req) => {
         data?.status ||
         "PENDING";
 
-      // Find subscription pending row
+      // Find subscription pending row by payment_reference
       const { data: subRows } = await admin
         .from("subscriptions")
-        .select("id, user_id, plan, metadata")
-        .contains("metadata", { payment_reference: reference } as any)
+        .select("id, user_id, plan")
+        .eq("payment_reference", reference)
         .limit(1);
 
       const sub = subRows?.[0];
@@ -137,7 +137,8 @@ Deno.serve(async (req) => {
       plan: planId,
       status: "pending",
       started_at: new Date().toISOString(),
-      metadata: { payment_reference: transactionId, provider: "payunit" } as any,
+      payment_reference: transactionId,
+      amount: Number(amount),
     });
 
     return new Response(
